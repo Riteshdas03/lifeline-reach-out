@@ -9,7 +9,7 @@ Imagine if finding the nearest hospital or a life-saving blood donor was just a 
 
 ## 🚀 Live Demo
 
-🌐 **Experience MediReach Now:** [https://your-deployment-link.com](https://your-deployment-link.com)  
+🌐 **Experience MediReach Now:** [https://medireachlifeline.netlify.app)  
 *(Replace with your Netlify/Vercel/Render link)*
 
 ---
