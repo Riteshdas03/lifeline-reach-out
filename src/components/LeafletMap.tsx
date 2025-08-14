@@ -6,7 +6,11 @@ import { AlertCircle, MapPin } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Hospital, UserLocation } from '@/types/hospital';
-import { mockHospitals } from '@/data/mockHospitals';
+import { Tables } from '@/integrations/supabase/types';
+import { useSupabaseHospitals } from '@/hooks/useSupabaseHospitals';
+import { adaptSupabaseHospitals } from '@/utils/hospitalAdapter';
+
+type SupabaseHospital = Tables<'hospitals'>;
 import { useGeolocation } from '@/hooks/useGeolocation';
 import MapLegend from './MapLegend';
 import HospitalListCard from './HospitalListCard';
@@ -23,8 +27,18 @@ const LeafletMap = () => {
   const mapRef = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<L.Map | null>(null);
   const [selectedHospital, setSelectedHospital] = useState<Hospital | null>(null);
+  const markersLayerRef = useRef<L.LayerGroup | null>(null);
+  const userMarkerRef = useRef<L.Marker | null>(null);
   
   const { userLocation, locationError, isLoading, getCurrentLocation } = useGeolocation();
+  const { hospitals: supabaseHospitals, loading: hospitalsLoading, error: hospitalsError } = useSupabaseHospitals({
+    userLat: userLocation?.lat,
+    userLng: userLocation?.lng,
+    radius: 20 // 20km radius
+  });
+
+  // Convert Supabase hospital format to component Hospital format
+  const hospitals = adaptSupabaseHospitals(supabaseHospitals);
 
   const getDirections = (hospital: Hospital) => {
     if (userLocation) {
@@ -34,6 +48,11 @@ const LeafletMap = () => {
   };
 
   const createUserLocationMarker = (leafletMap: L.Map, position: UserLocation) => {
+    // Remove existing user marker if it exists
+    if (userMarkerRef.current) {
+      leafletMap.removeLayer(userMarkerRef.current);
+    }
+
     const userIcon = L.divIcon({
       html: `
         <div style="position: relative;">
@@ -60,23 +79,23 @@ const LeafletMap = () => {
       className: 'user-location-marker'
     });
 
-    L.marker([position.lat, position.lng], { icon: userIcon })
+    userMarkerRef.current = L.marker([position.lat, position.lng], { icon: userIcon })
       .addTo(leafletMap)
-      .bindPopup('📍 You are here! Location detected successfully.')
+      .bindPopup('📍 You are here!')
       .openPopup();
   };
 
-  const createHospitalMarker = (leafletMap: L.Map, hospital: Hospital) => {
+  const createHospitalMarker = (hospital: Hospital): L.Marker => {
     const statusColors = {
       open: '#22c55e',
-      available: '#eab308', 
+      available: '#eab308',
       full: '#ef4444'
     };
 
     const hospitalIcon = L.divIcon({
       html: `
         <div style="
-          background-color: ${statusColors[hospital.status]}; 
+          background-color: ${statusColors[hospital.status as keyof typeof statusColors] || '#eab308'}; 
           width: 24px; 
           height: 24px; 
           border-radius: 50%; 
@@ -88,30 +107,22 @@ const LeafletMap = () => {
           color: white; 
           font-weight: bold; 
           font-size: 12px;
-          animation: bounce-pin 2s infinite;
           cursor: pointer;
         ">🏥</div>
-        <style>
-          @keyframes bounce-pin {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-3px); }
-          }
-        </style>
       `,
       iconSize: [24, 24],
       iconAnchor: [12, 12],
       className: 'hospital-marker'
     });
 
-    const marker = L.marker([hospital.lat, hospital.lng], { icon: hospitalIcon })
-      .addTo(leafletMap);
+    const marker = L.marker([hospital.lat, hospital.lng], { icon: hospitalIcon });
 
     const popupContent = `
       <div style="min-width: 200px;">
         <h3 style="margin: 0 0 8px 0; font-weight: bold; color: #1f2937;">${hospital.name}</h3>
         <p style="margin: 0 0 4px 0; color: #6b7280; font-size: 14px;">${hospital.type}</p>
         <p style="margin: 0 0 4px 0; color: #6b7280; font-size: 14px;">${hospital.address}</p>
-        <div style="margin: 8px 0; padding: 4px 8px; background-color: ${statusColors[hospital.status]}; color: white; border-radius: 4px; display: inline-block; font-size: 12px; font-weight: bold;">
+        <div style="margin: 8px 0; padding: 4px 8px; background-color: ${statusColors[hospital.status as keyof typeof statusColors] || '#eab308'}; color: white; border-radius: 4px; display: inline-block; font-size: 12px; font-weight: bold;">
           ${hospital.status.charAt(0).toUpperCase() + hospital.status.slice(1)}
         </div>
         <div style="margin-top: 8px; display: flex; gap: 8px;">
@@ -131,7 +142,7 @@ const LeafletMap = () => {
   };
 
   const initializeMap = (position: UserLocation) => {
-    if (mapRef.current) {
+    if (mapRef.current && !map) {
       const leafletMap = L.map(mapRef.current).setView([position.lat, position.lng], 14);
 
       // Add OpenStreetMap tiles
@@ -140,38 +151,70 @@ const LeafletMap = () => {
         maxZoom: 19,
       }).addTo(leafletMap);
 
+      // Create layer group for markers
+      markersLayerRef.current = L.layerGroup().addTo(leafletMap);
+
       setMap(leafletMap);
 
       // Add user location marker
       createUserLocationMarker(leafletMap, position);
-
-      // Add hospital markers
-      mockHospitals.forEach((hospital) => {
-        createHospitalMarker(leafletMap, hospital);
-      });
 
       return leafletMap;
     }
     return null;
   };
 
+  // Update hospital markers efficiently
+  const updateHospitalMarkers = (leafletMap: L.Map, hospitalsList: Hospital[]) => {
+    if (!markersLayerRef.current) return;
+
+    // Clear existing hospital markers
+    markersLayerRef.current.clearLayers();
+
+    // Add new hospital markers
+    hospitalsList.forEach((hospital) => {
+      const marker = createHospitalMarker(hospital);
+      markersLayerRef.current!.addLayer(marker);
+    });
+  };
+
+  // Initialize map only once
   useEffect(() => {
     if (userLocation && mapRef.current && !map) {
       initializeMap(userLocation);
     }
   }, [userLocation, map]);
 
+  // Update user location smoothly without re-initializing map
   useEffect(() => {
     if (map && userLocation) {
-      map.setView([userLocation.lat, userLocation.lng], 14);
+      // Smooth pan to new location
+      map.panTo([userLocation.lat, userLocation.lng]);
+      
+      // Update user marker
+      createUserLocationMarker(map, userLocation);
     }
   }, [map, userLocation]);
+
+  // Update hospital markers when hospitals data changes
+  useEffect(() => {
+    if (map && hospitals.length > 0) {
+      updateHospitalMarkers(map, hospitals);
+    }
+  }, [map, hospitals]);
 
   // Cleanup map on unmount
   useEffect(() => {
     return () => {
       if (map) {
         map.remove();
+        setMap(null);
+      }
+      if (markersLayerRef.current) {
+        markersLayerRef.current = null;
+      }
+      if (userMarkerRef.current) {
+        userMarkerRef.current = null;
       }
     };
   }, [map]);
@@ -233,9 +276,24 @@ const LeafletMap = () => {
 
         {/* Hospital List */}
         <div className="space-y-3">
-          <h3 className="text-lg font-semibold text-gray-900">Nearby Hospitals</h3>
+          <h3 className="text-lg font-semibold text-gray-900">
+            Nearby Hospitals {hospitals.length > 0 && `(${hospitals.length})`}
+          </h3>
+          
+          {hospitalsError && (
+            <div className="text-red-600 text-sm p-2 bg-red-50 rounded">
+              {hospitalsError}
+            </div>
+          )}
+          
+          {hospitalsLoading && (
+            <div className="text-gray-500 text-sm p-2 bg-gray-50 rounded">
+              Loading hospitals...
+            </div>
+          )}
+          
           <div className="space-y-3 max-h-[500px] overflow-y-auto">
-            {mockHospitals.map((hospital) => (
+            {hospitals.map((hospital) => (
               <HospitalListCard
                 key={hospital.id}
                 hospital={hospital}
@@ -243,6 +301,12 @@ const LeafletMap = () => {
                 onGetDirections={getDirections}
               />
             ))}
+            
+            {!hospitalsLoading && hospitals.length === 0 && (
+              <div className="text-gray-500 text-sm p-4 bg-gray-50 rounded text-center">
+                No hospitals found in your area
+              </div>
+            )}
           </div>
         </div>
       </div>
