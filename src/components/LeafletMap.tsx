@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 import { AlertCircle, MapPin } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,6 +10,8 @@ import { Hospital, UserLocation } from '@/types/hospital';
 import { Tables } from '@/integrations/supabase/types';
 import { useSupabaseHospitals } from '@/hooks/useSupabaseHospitals';
 import { adaptSupabaseHospitals } from '@/utils/hospitalAdapter';
+import { routingService, RouteResult } from '@/services/routingService';
+import DirectionsPanel from './DirectionsPanel';
 
 type SupabaseHospital = Tables<'hospitals'>;
 import { useGeolocation } from '@/hooks/useGeolocation';
@@ -27,8 +30,12 @@ const LeafletMap = () => {
   const mapRef = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<L.Map | null>(null);
   const [selectedHospital, setSelectedHospital] = useState<Hospital | null>(null);
+  const [currentRoute, setCurrentRoute] = useState<RouteResult | null>(null);
+  const [routeLoading, setRouteLoading] = useState(false);
+  const [routeError, setRouteError] = useState<string>('');
   const markersLayerRef = useRef<L.LayerGroup | null>(null);
   const userMarkerRef = useRef<L.Marker | null>(null);
+  const routingControlRef = useRef<L.Routing.Control | null>(null);
   
   const { userLocation, locationError, isLoading, getCurrentLocation } = useGeolocation();
   const { hospitals: supabaseHospitals, loading: hospitalsLoading, error: hospitalsError } = useSupabaseHospitals({
@@ -40,11 +47,55 @@ const LeafletMap = () => {
   // Convert Supabase hospital format to component Hospital format
   const hospitals = adaptSupabaseHospitals(supabaseHospitals);
 
-  const getDirections = (hospital: Hospital) => {
-    if (userLocation) {
-      const url = `https://www.google.com/maps/dir/${userLocation.lat},${userLocation.lng}/${hospital.lat},${hospital.lng}`;
-      window.open(url, '_blank');
+  const getDirections = async (hospital: Hospital) => {
+    if (!userLocation || !map) return;
+
+    try {
+      setRouteLoading(true);
+      setRouteError('');
+      setSelectedHospital(hospital);
+
+      // Clear previous route
+      if (routingControlRef.current) {
+        map.removeControl(routingControlRef.current);
+        routingControlRef.current = null;
+      }
+
+      const startLatLng = L.latLng(userLocation.lat, userLocation.lng);
+      const endLatLng = L.latLng(hospital.lat, hospital.lng);
+
+      // Get route data
+      const route = await routingService.getRoute(startLatLng, endLatLng);
+      setCurrentRoute(route);
+
+      // Add routing control to map
+      const routingControl = routingService.createRoutingControl(startLatLng, endLatLng);
+      routingControlRef.current = routingControl;
+      routingControl.addTo(map);
+
+      // Fit map to show the route
+      const group = L.featureGroup([
+        L.marker(startLatLng),
+        L.marker(endLatLng)
+      ]);
+      map.fitBounds(group.getBounds().pad(0.1));
+
+    } catch (error) {
+      console.error('Error getting directions:', error);
+      setRouteError(error instanceof Error ? error.message : 'Failed to get directions');
+    } finally {
+      setRouteLoading(false);
     }
+  };
+
+  const clearRoute = () => {
+    if (map && routingControlRef.current) {
+      map.removeControl(routingControlRef.current);
+      routingControlRef.current = null;
+    }
+    setCurrentRoute(null);
+    setSelectedHospital(null);
+    setRouteError('');
   };
 
   const createUserLocationMarker = (leafletMap: L.Map, position: UserLocation) => {
@@ -127,7 +178,7 @@ const LeafletMap = () => {
         </div>
         <div style="margin-top: 8px; display: flex; gap: 8px;">
           <button onclick="window.open('tel:${hospital.phone}', '_self')" style="padding: 4px 8px; background-color: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">Call</button>
-          <button onclick="window.open('https://www.google.com/maps/dir/${userLocation?.lat || 0},${userLocation?.lng || 0}/${hospital.lat},${hospital.lng}', '_blank')" style="padding: 4px 8px; background-color: #059669; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">Directions</button>
+          <button onclick="window.getDirections && window.getDirections('${hospital.id}')" style="padding: 4px 8px; background-color: #059669; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">Directions</button>
         </div>
       </div>
     `;
@@ -135,7 +186,7 @@ const LeafletMap = () => {
     marker.bindPopup(popupContent);
 
     marker.on('click', () => {
-      setSelectedHospital(hospital);
+      getDirections(hospital);
     });
 
     return marker;
@@ -207,6 +258,9 @@ const LeafletMap = () => {
   useEffect(() => {
     return () => {
       if (map) {
+        if (routingControlRef.current) {
+          map.removeControl(routingControlRef.current);
+        }
         map.remove();
         setMap(null);
       }
@@ -215,6 +269,9 @@ const LeafletMap = () => {
       }
       if (userMarkerRef.current) {
         userMarkerRef.current = null;
+      }
+      if (routingControlRef.current) {
+        routingControlRef.current = null;
       }
     };
   }, [map]);
@@ -271,6 +328,19 @@ const LeafletMap = () => {
               className="w-full h-96 lg:h-[500px] rounded-lg shadow-lg border z-0"
             />
             <MapLegend />
+            
+            {/* Floating Directions Panel */}
+            {(currentRoute || routeLoading || routeError) && (
+              <div className="absolute top-4 right-4 z-10 max-w-sm">
+                <DirectionsPanel
+                  route={currentRoute}
+                  destinationName={selectedHospital?.name || 'Selected Hospital'}
+                  isLoading={routeLoading}
+                  error={routeError}
+                  onClose={clearRoute}
+                />
+              </div>
+            )}
           </div>
         </div>
 
