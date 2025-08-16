@@ -50,10 +50,10 @@ const EmergencyDonorSearch = () => {
     setLoading(true);
     
     try {
-      // Search for donors within 10km radius
+      // Only search for donors with SOS enabled (secure access for emergencies)
       const { data, error } = await supabase
         .from('donors')
-        .select('*')
+        .select('id, name, phone, blood_group, latitude, longitude, last_donation_date, sos_enabled')
         .eq('blood_group', selectedBloodGroup)
         .eq('sos_enabled', true);
 

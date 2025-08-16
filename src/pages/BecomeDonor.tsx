@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate, Link } from 'react-router-dom';
 import Header from '@/components/Header';
+import { validateCoordinates, validatePhoneNumber, sanitizeInput, validateRequired, validateBloodGroup } from '@/utils/validation';
 
 const BecomeDonor = () => {
   const [formData, setFormData] = useState({
@@ -54,11 +55,33 @@ const BecomeDonor = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.phone || !formData.bloodGroup || !formData.latitude || !formData.longitude) {
+    // Input validation
+    const errors: string[] = [];
+    
+    if (!validateRequired(formData.name)) {
+      errors.push("Name is required");
+    }
+    
+    if (!validatePhoneNumber(formData.phone)) {
+      errors.push("Please enter a valid phone number");
+    }
+    
+    if (!validateBloodGroup(formData.bloodGroup)) {
+      errors.push("Please select a valid blood group");
+    }
+    
+    const lat = parseFloat(formData.latitude);
+    const lng = parseFloat(formData.longitude);
+    
+    if (!validateCoordinates(lat, lng)) {
+      errors.push("Please provide valid coordinates");
+    }
+    
+    if (errors.length > 0) {
       toast({
-        title: "Missing Required Fields",
-        description: "Please fill in all required fields",
-        variant: "destructive"
+        title: "Validation Error",
+        description: errors.join(", "),
+        variant: "destructive",
       });
       return;
     }
@@ -82,11 +105,11 @@ const BecomeDonor = () => {
         .from('donors')
         .insert({
           user_id: user.id,
-          name: formData.name,
-          phone: formData.phone,
+          name: sanitizeInput(formData.name),
+          phone: sanitizeInput(formData.phone),
           blood_group: formData.bloodGroup,
-          latitude: parseFloat(formData.latitude),
-          longitude: parseFloat(formData.longitude),
+          latitude: lat,
+          longitude: lng,
           sos_enabled: formData.sosEnabled,
           last_donation_date: formData.lastDonationDate || null
         });

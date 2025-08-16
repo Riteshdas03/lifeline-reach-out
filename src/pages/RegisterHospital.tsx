@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate, Link } from 'react-router-dom';
 import Header from '@/components/Header';
+import { validateCoordinates, validatePhoneNumber, sanitizeInput, validateRequired } from '@/utils/validation';
 
 const RegisterHospital = () => {
   const [formData, setFormData] = useState({
@@ -68,11 +69,33 @@ const RegisterHospital = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.contact || !formData.latitude || !formData.longitude) {
+    // Input validation
+    const errors: string[] = [];
+    
+    if (!validateRequired(formData.name)) {
+      errors.push("Hospital name is required");
+    }
+    
+    if (!validatePhoneNumber(formData.contact)) {
+      errors.push("Please enter a valid contact number");
+    }
+    
+    if (!validateRequired(formData.address)) {
+      errors.push("Address is required");
+    }
+    
+    const lat = parseFloat(formData.latitude);
+    const lng = parseFloat(formData.longitude);
+    
+    if (!validateCoordinates(lat, lng)) {
+      errors.push("Please provide valid coordinates");
+    }
+    
+    if (errors.length > 0) {
       toast({
-        title: "Missing Required Fields",
-        description: "Please fill in all required fields",
-        variant: "destructive"
+        title: "Validation Error",
+        description: errors.join(", "),
+        variant: "destructive",
       });
       return;
     }
@@ -90,11 +113,11 @@ const RegisterHospital = () => {
       const { error } = await supabase
         .from('hospitals')
         .insert({
-          name: formData.name,
-          address: formData.address || null,
-          contact: formData.contact,
-          latitude: parseFloat(formData.latitude),
-          longitude: parseFloat(formData.longitude),
+          name: sanitizeInput(formData.name),
+          address: sanitizeInput(formData.address) || null,
+          contact: sanitizeInput(formData.contact),
+          latitude: lat,
+          longitude: lng,
           type: formData.type as any || 'private',
           services: formData.services.length > 0 ? formData.services : null,
           status: 'available',
