@@ -74,16 +74,22 @@ const Auth = () => {
     setError("");
     
     try {
+      console.log("Starting Google sign-in...");
+      console.log("Current origin:", window.location.origin);
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: window.location.origin,
         },
       });
+      
       if (error) {
+        console.error("Google sign-in error:", error);
         setError(error.message);
       }
     } catch (err) {
+      console.error("Unexpected error:", err);
       setError("An unexpected error occurred during Google sign-in");
     } finally {
       setLoading(false);
