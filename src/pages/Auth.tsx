@@ -58,33 +58,12 @@ const Auth = () => {
   const handleGoogleSignIn = async () => {
     setLoading(true);
     setError('');
-    console.log('🎯 Google sign-in button clicked');
 
-    try {
-      const { error } = await signInWithGoogle();
-      
-      if (error) {
-        console.error('🚨 Google sign-in error:', error);
-        
-        // Provide more specific error messages
-        let errorMessage = error.message;
-        if (error.message?.includes('popup')) {
-          errorMessage = 'Please allow popups for this site and try again.';
-        } else if (error.message?.includes('refused to connect')) {
-          errorMessage = 'Authentication service temporarily unavailable. Please try again.';
-        } else if (error.message?.includes('network')) {
-          errorMessage = 'Network error. Please check your connection and try again.';
-        }
-        
-        setError(errorMessage);
-      } else {
-        console.log('✅ Google sign-in successful!');
-      }
-    } catch (err: any) {
-      console.error('💥 Unexpected error in handleGoogleSignIn:', err);
-      setError('An unexpected error occurred. Please try again.');
-    }
+    const { error } = await signInWithGoogle();
     
+    if (error) {
+      setError(error.message);
+    }
     setLoading(false);
   };
 
