@@ -79,7 +79,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: 'https://medireachlifeline.netlify.app',
+        redirectTo: window.location.origin,
       },
     });
     return { error };
