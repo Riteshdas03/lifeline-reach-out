@@ -8,13 +8,14 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { Link } from 'react-router-dom';
 
 const Header = () => {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
 
   const handleSignOut = async () => {
-    await signOut();
+    await supabase.auth.signOut();
   };
 
   return (

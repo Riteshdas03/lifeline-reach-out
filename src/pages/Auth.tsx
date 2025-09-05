@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from "@/integrations/supabase/client";
 import { Heart, Shield, Users, Activity } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 
@@ -17,7 +18,7 @@ const Auth = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
-  const { signUp, signIn, signInWithGoogle, user } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,7 +33,17 @@ const Auth = () => {
     setError('');
     setMessage('');
 
-    const { error } = await signUp(email, password, fullName);
+    const redirectUrl = `${window.location.origin}/`;
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: redirectUrl,
+        data: {
+          full_name: fullName,
+        },
+      },
+    });
     
     if (error) {
       setError(error.message);
@@ -47,7 +58,10 @@ const Auth = () => {
     setLoading(true);
     setError('');
 
-    const { error } = await signIn(email, password);
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
     
     if (error) {
       setError(error.message);
@@ -57,14 +71,23 @@ const Auth = () => {
 
   const handleGoogleSignIn = async () => {
     setLoading(true);
-    setError('');
-
-    const { error } = await signInWithGoogle();
+    setError("");
     
-    if (error) {
-      setError(error.message);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+      if (error) {
+        setError(error.message);
+      }
+    } catch (err) {
+      setError("An unexpected error occurred during Google sign-in");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (

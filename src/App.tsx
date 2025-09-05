@@ -11,6 +11,7 @@ import NotFound from "./pages/NotFound";
 import RegisterHospital from "./pages/RegisterHospital";
 import BecomeDonor from "./pages/BecomeDonor";
 import ApiTestPanel from "./components/ApiTestPanel";
+import AuthCallback from "./components/AuthCallback";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/register-hospital" element={<RegisterHospital />} />
             <Route path="/become-donor" element={<BecomeDonor />} />
             <Route path="/api-test" element={<ApiTestPanel />} />
