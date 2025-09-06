@@ -160,8 +160,8 @@ const RegisterHospital = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
       <Header />
       
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="mb-8">
+      <div className="max-w-4xl mx-auto px-4 py-6 sm:py-8">
+        <div className="mb-6 sm:mb-8">
           <Link to="/">
             <Button variant="ghost" className="mb-4">
               <ArrowLeft className="w-4 h-4 mr-2" />
@@ -170,30 +170,30 @@ const RegisterHospital = () => {
           </Link>
           
           <div className="text-center">
-            <div className="bg-gradient-to-br from-blue-600 to-blue-700 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <Building2 className="h-10 w-10 text-white" />
+            <div className="bg-gradient-to-br from-blue-600 to-blue-700 w-16 h-16 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6">
+              <Building2 className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
             </div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">Register Your Hospital</h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">Register Your Hospital</h1>
+            <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto">
               Join our network of healthcare providers and help patients find quality medical care
             </p>
           </div>
         </div>
 
         <Card className="shadow-xl border-0">
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Heart className="w-6 h-6 mr-3 text-blue-600" />
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="flex items-center text-lg sm:text-xl">
+              <Heart className="w-5 h-5 sm:w-6 sm:h-6 mr-3 text-blue-600" />
               Hospital Information
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-sm sm:text-base">
               Please provide accurate information about your healthcare facility
             </CardDescription>
           </CardHeader>
           
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CardContent className="p-4 sm:p-6">
+            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+              <div className="grid grid-cols-1 gap-4 sm:gap-6">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700">Hospital Name *</label>
                   <Input
@@ -239,7 +239,7 @@ const RegisterHospital = () => {
                 </Select>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700">Latitude *</label>
                   <Input
@@ -265,7 +265,7 @@ const RegisterHospital = () => {
                     type="button"
                     variant="outline"
                     onClick={getCurrentLocation}
-                    className="w-full"
+                    className="w-full text-sm"
                   >
                     <MapPin className="w-4 h-4 mr-2" />
                     Get Location
@@ -273,14 +273,14 @@ const RegisterHospital = () => {
                 </div>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 <label className="text-sm font-medium text-gray-700">Available Services</label>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
                   {serviceOptions.map((service) => (
                     <Badge
                       key={service}
                       variant={formData.services.includes(service) ? "default" : "outline"}
-                      className="cursor-pointer p-3 justify-center hover:bg-blue-50 transition-colors"
+                      className="cursor-pointer p-2 sm:p-3 justify-center hover:bg-blue-50 transition-colors text-xs sm:text-sm"
                       onClick={() => toggleService(service)}
                     >
                       {service}
@@ -289,7 +289,7 @@ const RegisterHospital = () => {
                 </div>
               </div>
 
-              <div className="flex gap-4 pt-6">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4 sm:pt-6">
                 <Button
                   type="button"
                   variant="outline"
