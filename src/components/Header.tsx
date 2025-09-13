@@ -23,9 +23,9 @@ const Header = () => {
   };
 
   const navigation = [
-    { name: 'Find Hospitals', href: '/#services-section', icon: MapPin },
-    { name: 'Emergency Services', href: '/#services-section', icon: Phone },
-    { name: 'Health Camps', href: '/#services-section', icon: Users },
+    { name: 'Find Hospitals', href: '/find-hospitals', icon: MapPin },
+    { name: 'Emergency Services', href: '/emergency-services', icon: Phone },
+    { name: 'Health Camps', href: '/health-camps', icon: Users },
     { name: 'Register Hospital', href: '/register-hospital', icon: Heart },
     { name: 'Become Donor', href: '/become-donor', icon: Heart },
   ];
@@ -45,19 +45,13 @@ const Header = () => {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-1">
             {navigation.slice(0, 3).map((item) => (
-              <a
+              <Link
                 key={item.name}
-                href={item.href}
+                to={item.href}
                 className="text-muted-foreground hover:text-foreground px-3 py-2 rounded-md text-sm font-medium transition-colors"
-                onClick={(e) => {
-                  if (item.href.includes('#')) {
-                    e.preventDefault();
-                    document.getElementById('services-section')?.scrollIntoView({ behavior: 'smooth' });
-                  }
-                }}
               >
                 {item.name}
-              </a>
+              </Link>
             ))}
           </nav>
 
@@ -86,7 +80,7 @@ const Header = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Link to="/auth">
+              <Link to="/sign-in">
                 <Button variant="outline" size="sm" className="bg-background">
                   <User className="mr-2 h-4 w-4" />
                   Sign In
@@ -122,19 +116,9 @@ const Header = () => {
                       {navigation.map((item) => (
                         <Link
                           key={item.name}
-                          to={item.href.startsWith('/#') ? '/' : item.href}
+                          to={item.href}
                           className="flex items-center gap-3 text-foreground hover:bg-muted px-3 py-3 rounded-lg text-base font-medium transition-colors"
-                          onClick={(e) => {
-                            if (item.href.includes('#')) {
-                              e.preventDefault();
-                              setMobileMenuOpen(false);
-                              setTimeout(() => {
-                                document.getElementById('services-section')?.scrollIntoView({ behavior: 'smooth' });
-                              }, 100);
-                            } else {
-                              setMobileMenuOpen(false);
-                            }
-                          }}
+                          onClick={() => setMobileMenuOpen(false)}
                         >
                           <item.icon className="h-5 w-5 text-primary" />
                           {item.name}
@@ -172,7 +156,7 @@ const Header = () => {
                         </Button>
                       </div>
                     ) : (
-                      <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>
+                      <Link to="/sign-in" onClick={() => setMobileMenuOpen(false)}>
                         <Button className="w-full bg-primary hover:bg-primary/90">
                           <User className="mr-2 h-4 w-4" />
                           Sign In

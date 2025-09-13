@@ -227,33 +227,33 @@ const Index = () => {
             <div className="mt-8 md:mt-0">
               <h3 className="text-base sm:text-lg font-semibold mb-4 sm:mb-6 text-blue-400">Quick Access</h3>
               <ul className="space-y-2 sm:space-y-3">
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors flex items-center group text-sm sm:text-base">
+                <li><Link to="/find-hospitals" className="text-gray-300 hover:text-white transition-colors flex items-center group text-sm sm:text-base">
                   <MapPin className="w-3 h-3 sm:w-4 sm:h-4 mr-2 group-hover:text-blue-400" />
                   Find Hospitals
-                </a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors flex items-center group text-sm sm:text-base">
+                </Link></li>
+                <li><Link to="/blood-banks" className="text-gray-300 hover:text-white transition-colors flex items-center group text-sm sm:text-base">
                   <Heart className="w-3 h-3 sm:w-4 sm:h-4 mr-2 group-hover:text-blue-400" />
                   Blood Banks
-                </a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors flex items-center group text-sm sm:text-base">
+                </Link></li>
+                <li><Link to="/emergency-services" className="text-gray-300 hover:text-white transition-colors flex items-center group text-sm sm:text-base">
                   <Phone className="w-3 h-3 sm:w-4 sm:h-4 mr-2 group-hover:text-blue-400" />
                   Emergency Services
-                </a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors flex items-center group text-sm sm:text-base">
+                </Link></li>
+                <li><Link to="/health-camps" className="text-gray-300 hover:text-white transition-colors flex items-center group text-sm sm:text-base">
                   <Users className="w-3 h-3 sm:w-4 sm:h-4 mr-2 group-hover:text-blue-400" />
                   Health Camps
-                </a></li>
+                </Link></li>
               </ul>
             </div>
             
             <div className="mt-8 md:mt-0">
               <h3 className="text-base sm:text-lg font-semibold mb-4 sm:mb-6 text-blue-400">Support</h3>
               <ul className="space-y-2 sm:space-y-3">
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">Help Center</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">Contact Us</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">Privacy Policy</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">Terms of Service</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">Accessibility</a></li>
+                <li><Link to="/about" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">About Us</Link></li>
+                <li><Link to="/contact" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">Contact Us</Link></li>
+                <li><Link to="/privacy-policy" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">Privacy Policy</Link></li>
+                <li><Link to="/terms-of-service" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">Terms of Service</Link></li>
+                <li><Link to="/about" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">About</Link></li>
               </ul>
             </div>
           </div>

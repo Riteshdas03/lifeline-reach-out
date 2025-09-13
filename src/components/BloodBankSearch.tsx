@@ -118,84 +118,87 @@ const BloodBankSearch = () => {
   };
 
   return (
-    <div className="p-6">
-      <div className="mb-6">
-        <h3 className="text-2xl font-bold text-gray-900 mb-2">Blood Bank & Donor Network</h3>
-        <p className="text-gray-600">Find blood banks and verified donors in your area</p>
+    <div className="p-4 sm:p-6">
+      <div className="mb-6 sm:mb-8">
+        <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Blood Bank & Donor Network</h3>
+        <p className="text-gray-600 text-sm sm:text-base">Find blood banks and verified donors in your area</p>
       </div>
 
-      {/* Search Section */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <Select value={bloodGroup} onValueChange={setBloodGroup}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select Blood Group" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="A+">A+</SelectItem>
-            <SelectItem value="A-">A-</SelectItem>
-            <SelectItem value="B+">B+</SelectItem>
-            <SelectItem value="B-">B-</SelectItem>
-            <SelectItem value="AB+">AB+</SelectItem>
-            <SelectItem value="AB-">AB-</SelectItem>
-            <SelectItem value="O+">O+</SelectItem>
-            <SelectItem value="O-">O-</SelectItem>
-          </SelectContent>
-        </Select>
+      {/* Search Section - Mobile First */}
+      <div className="space-y-4 mb-6 sm:mb-8">
+        <div className="grid grid-cols-1 gap-4">
+          <Select value={bloodGroup} onValueChange={setBloodGroup}>
+            <SelectTrigger className="w-full h-12">
+              <SelectValue placeholder="Select Blood Group" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="A+">A+</SelectItem>
+              <SelectItem value="A-">A-</SelectItem>
+              <SelectItem value="B+">B+</SelectItem>
+              <SelectItem value="B-">B-</SelectItem>
+              <SelectItem value="AB+">AB+</SelectItem>
+              <SelectItem value="AB-">AB-</SelectItem>
+              <SelectItem value="O+">O+</SelectItem>
+              <SelectItem value="O-">O-</SelectItem>
+            </SelectContent>
+          </Select>
 
-        <Input
-          placeholder="Enter your location"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-        />
+          <Input
+            placeholder="Enter your location"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            className="w-full h-12"
+          />
 
-        <Button 
-          className="bg-red-600 hover:bg-red-700 text-white"
-          onClick={handleSearch}
-          disabled={!bloodGroup || banksLoading}
-        >
-          {banksLoading ? (
-            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-          ) : (
-            <Search className="w-4 h-4 mr-2" />
-          )}
-          🩸 Find Blood
-        </Button>
+          <Button 
+            className="w-full h-12 bg-red-600 hover:bg-red-700 text-white text-base font-semibold"
+            onClick={handleSearch}
+            disabled={!bloodGroup || banksLoading}
+          >
+            {banksLoading ? (
+              <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+            ) : (
+              <Search className="w-5 h-5 mr-2" />
+            )}
+            🩸 Find Blood
+          </Button>
+        </div>
       </div>
 
-      {/* Emergency SOS */}
-      <Card className="mb-6 border-red-200 bg-red-50">
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <div className="bg-red-600 p-2 rounded-full mr-4">
-                <Heart className="w-6 h-6 text-white" />
+      {/* Emergency SOS - Mobile Optimized */}
+      <Card className="mb-6 sm:mb-8 border-red-200 bg-red-50">
+        <CardContent className="p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-start">
+              <div className="bg-red-600 p-2 sm:p-3 rounded-full mr-3 sm:mr-4 flex-shrink-0">
+                <Heart className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
               <div>
-                <h4 className="font-semibold text-red-800">Emergency Blood Needed?</h4>
-                <p className="text-red-600 text-sm">Send SOS alert to nearby donors and blood banks</p>
+                <h4 className="font-semibold text-red-800 text-base sm:text-lg">Emergency Blood Needed?</h4>
+                <p className="text-red-600 text-sm sm:text-base">Send SOS alert to nearby donors and blood banks</p>
               </div>
             </div>
             <Button 
-              className="bg-red-600 hover:bg-red-700 text-white"
+              className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white h-12 sm:h-10 text-base font-semibold"
               onClick={handleSOSAlert}
               disabled={donorsLoading}
             >
               {donorsLoading ? (
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
               ) : (
-                <Heart className="w-4 h-4 mr-2" />
+                <Heart className="w-5 h-5 mr-2" />
               )}
-              Send SOS Alert
+              Send SOS
             </Button>
           </div>
         </CardContent>
       </Card>
 
-      {/* Results Tabs */}
+      {/* Results Tabs - Mobile Optimized */}
       <Tabs defaultValue="banks" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-6">
-          <TabsTrigger value="banks">Blood Banks</TabsTrigger>
-          <TabsTrigger value="donors">Individual Donors</TabsTrigger>
+        <TabsList className="w-full h-12 grid grid-cols-2 mb-6 sm:mb-8">
+          <TabsTrigger value="banks" className="text-sm sm:text-base">Blood Banks</TabsTrigger>
+          <TabsTrigger value="donors" className="text-sm sm:text-base">Individual Donors</TabsTrigger>
         </TabsList>
 
         <TabsContent value="banks">
@@ -231,24 +234,24 @@ const BloodBankSearch = () => {
                       </div>
                     </CardHeader>
 
-                    <CardContent>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+                    <CardContent className="p-4 sm:p-6">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6">
                         <div className="flex items-center text-sm text-gray-600">
-                          <MapPin className="w-4 h-4 mr-2" />
-                          {formatDistance((bank as any).distance) || 'Distance unavailable'}
+                          <MapPin className="w-4 h-4 mr-2 flex-shrink-0" />
+                          <span className="truncate">{formatDistance((bank as any).distance) || 'Distance unavailable'}</span>
                         </div>
                         <div className="flex items-center text-sm text-gray-600">
-                          <Clock className="w-4 h-4 mr-2" />
-                          {bank.operating_hours || '24/7'}
+                          <Clock className="w-4 h-4 mr-2 flex-shrink-0" />
+                          <span className="truncate">{bank.operating_hours || '24/7'}</span>
                         </div>
-                        <div className="flex items-center text-sm text-gray-600">
-                          <Phone className="w-4 h-4 mr-2" />
-                          {bank.contact}
+                        <div className="flex items-center text-sm text-gray-600 sm:col-span-1 lg:col-span-1">
+                          <Phone className="w-4 h-4 mr-2 flex-shrink-0" />
+                          <span className="truncate">{bank.contact}</span>
                         </div>
                       </div>
 
-                      <div className="mb-4">
-                        <h5 className="font-medium text-gray-900 mb-2">Available Blood Groups</h5>
+                      <div className="mb-4 sm:mb-6">
+                        <h5 className="font-medium text-gray-900 mb-2 sm:mb-3">Available Blood Groups</h5>
                         <div className="flex flex-wrap gap-2">
                           {bank.blood_groups.map((group) => (
                             <Badge key={group} variant="secondary" className="text-xs">
@@ -258,9 +261,9 @@ const BloodBankSearch = () => {
                         </div>
                       </div>
 
-                      <div className="flex gap-2">
+                      <div className="flex flex-col sm:flex-row gap-3">
                         <Button 
-                          className="flex-1 bg-blue-600 hover:bg-blue-700"
+                          className="flex-1 bg-blue-600 hover:bg-blue-700 h-12 sm:h-10"
                           onClick={() => window.open(`tel:${bank.contact}`)}
                         >
                           <Phone className="w-4 h-4 mr-2" />
@@ -268,7 +271,7 @@ const BloodBankSearch = () => {
                         </Button>
                         <Button 
                           variant="outline" 
-                          className="flex-1"
+                          className="flex-1 h-12 sm:h-10"
                           onClick={() => {
                             const url = `https://www.google.com/maps/search/?api=1&query=${bank.latitude},${bank.longitude}`;
                             window.open(url, '_blank');
@@ -299,29 +302,29 @@ const BloodBankSearch = () => {
               <span>Loading donors...</span>
             </div>
           ) : (
-            <div className="grid gap-4">
+            <div className="grid gap-4 sm:gap-6">
               {donors.length === 0 ? (
-                <div className="text-center py-8">
+                <div className="text-center py-8 sm:py-12">
                   <p className="text-gray-500">No SOS-enabled donors found. Try searching for a specific blood group.</p>
                 </div>
               ) : (
                 donors.map((donor) => (
                   <Card key={donor.id} className="hover:shadow-lg transition-shadow">
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center">
-                          <div className="bg-red-100 p-3 rounded-full mr-4">
-                            <User className="w-6 h-6 text-red-600" />
+                    <CardContent className="p-4 sm:p-6">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div className="flex items-start">
+                          <div className="bg-red-100 p-3 rounded-full mr-3 sm:mr-4 flex-shrink-0">
+                            <User className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
                           </div>
-                          <div>
-                            <h4 className="font-semibold text-gray-900 flex items-center">
-                              {donor.name}
-                              <Badge className="ml-2 bg-green-100 text-green-800">
+                          <div className="min-w-0 flex-1">
+                            <h4 className="font-semibold text-gray-900 flex flex-col sm:flex-row sm:items-center gap-2 mb-1">
+                              <span>{donor.name}</span>
+                              <Badge className="bg-green-100 text-green-800 text-xs self-start sm:self-auto">
                                 <CheckCircle className="w-3 h-3 mr-1" />
                                 SOS Enabled
                               </Badge>
                             </h4>
-                            <p className="text-sm text-gray-600">
+                            <p className="text-sm text-gray-600 mb-1">
                               {donor.blood_group} • {formatDistance((donor as any).distance)} away
                             </p>
                             {donor.last_donation_date && (
@@ -331,14 +334,15 @@ const BloodBankSearch = () => {
                             )}
                           </div>
                         </div>
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 w-full sm:w-auto">
                           <Button 
                             size="sm" 
-                            className="bg-red-600 hover:bg-red-700"
+                            className="flex-1 sm:flex-none bg-red-600 hover:bg-red-700 h-10"
                             onClick={() => window.open(`tel:${donor.phone}`)}
                           >
-                            <Phone className="w-4 h-4 mr-1" />
-                            Contact
+                            <Phone className="w-4 h-4 mr-1 sm:mr-2" />
+                            <span className="hidden sm:inline">Contact</span>
+                            <span className="sm:hidden">Call</span>
                           </Button>
                         </div>
                       </div>
