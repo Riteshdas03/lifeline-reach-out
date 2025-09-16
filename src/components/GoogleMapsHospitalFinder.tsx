@@ -5,7 +5,13 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
-import { MarkerClusterer } from '@googlemaps/markerclusterer';
+
+declare global {
+  interface Window {
+    google: any;
+    MarkerClusterer: any;
+  }
+}
 
 interface Hospital {
   id: string;
@@ -22,10 +28,10 @@ interface Hospital {
 
 const GoogleMapsHospitalFinder: React.FC = () => {
   const mapRef = useRef<HTMLDivElement>(null);
-  const [map, setMap] = useState<google.maps.Map | null>(null);
-  const [markers, setMarkers] = useState<google.maps.Marker[]>([]);
-  const [infoWindows, setInfoWindows] = useState<google.maps.InfoWindow[]>([]);
-  const [markerCluster, setMarkerCluster] = useState<MarkerClusterer | null>(null);
+  const [map, setMap] = useState<any>(null);
+  const [markers, setMarkers] = useState<any[]>([]);
+  const [infoWindows, setInfoWindows] = useState<any[]>([]);
+  const [markerCluster, setMarkerCluster] = useState<any>(null);
   const [hospitals, setHospitals] = useState<Hospital[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -40,7 +46,7 @@ const GoogleMapsHospitalFinder: React.FC = () => {
 
       const defaultLocation = { lat: 28.6139, lng: 77.2090 }; // New Delhi fallback
 
-      const newMap = new google.maps.Map(mapRef.current, {
+      const newMap = new window.google.maps.Map(mapRef.current, {
         center: defaultLocation,
         zoom: 13,
         mapTypeId: mapType,
@@ -53,8 +59,8 @@ const GoogleMapsHospitalFinder: React.FC = () => {
 
       // Initialize Places Autocomplete
       const input = document.getElementById('searchInput') as HTMLInputElement;
-      if (input) {
-        const autocomplete = new google.maps.places.Autocomplete(input, {
+      if (input && window.google.maps.places) {
+        const autocomplete = new window.google.maps.places.Autocomplete(input, {
           types: ['geocode', 'establishment'],
         });
 
@@ -84,6 +90,12 @@ const GoogleMapsHospitalFinder: React.FC = () => {
       script.defer = true;
       script.onload = initMap;
       document.head.appendChild(script);
+      
+      // Also load MarkerClusterer
+      const clusterScript = document.createElement('script');
+      clusterScript.src = 'https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js';
+      clusterScript.async = true;
+      document.head.appendChild(clusterScript);
     } else {
       initMap();
     }
@@ -132,11 +144,12 @@ const GoogleMapsHospitalFinder: React.FC = () => {
         lng: location.lng,
         radius_m: 10000,
         search_term: query || null
-      });
+      }) as { data: Hospital[] | null; error: any };
 
       if (error) throw error;
-      setHospitals(data || []);
-      renderHospitalsOnMap(data || []);
+      const hospitals = (data || []) as Hospital[];
+      setHospitals(hospitals);
+      renderHospitalsOnMap(hospitals);
     } catch (error) {
       console.error('Error loading nearby hospitals:', error);
     } finally {
@@ -164,25 +177,24 @@ const GoogleMapsHospitalFinder: React.FC = () => {
   };
 
   const renderHospitalsOnMap = (hospitalsData: Hospital[]) => {
-    if (!map) return;
+    if (!map || !window.google) return;
 
     clearMarkersAndInfoWindows();
 
-    const newMarkers: google.maps.Marker[] = [];
-    const newInfoWindows: google.maps.InfoWindow[] = [];
+    const newMarkers: any[] = [];
+    const newInfoWindows: any[] = [];
 
     hospitalsData.forEach((hospital, index) => {
       if (!hospital.latitude || !hospital.longitude) return;
 
-      const marker = new google.maps.Marker({
+      const marker = new window.google.maps.Marker({
         position: { lat: hospital.latitude, lng: hospital.longitude },
         map,
         title: hospital.name,
         icon: {
           url: getHospitalIcon(hospital.status),
-          scaledSize: new google.maps.Size(32, 32)
+          scaledSize: new window.google.maps.Size(32, 32)
         },
-        zIndex: 1,
       });
 
       const infoWindowContent = `
@@ -210,7 +222,7 @@ const GoogleMapsHospitalFinder: React.FC = () => {
         </div>
       `;
 
-      const infoWindow = new google.maps.InfoWindow({
+      const infoWindow = new window.google.maps.InfoWindow({
         content: infoWindowContent
       });
 
@@ -227,13 +239,15 @@ const GoogleMapsHospitalFinder: React.FC = () => {
     setMarkers(newMarkers);
     setInfoWindows(newInfoWindows);
 
-    // Add marker clustering
-    const cluster = new MarkerClusterer({ map, markers: newMarkers });
-    setMarkerCluster(cluster);
+    // Add marker clustering if available
+    if (window.MarkerClusterer && newMarkers.length > 0) {
+      const cluster = new window.MarkerClusterer({ map, markers: newMarkers });
+      setMarkerCluster(cluster);
+    }
 
     // Fit map to markers if any
     if (newMarkers.length > 0) {
-      const bounds = new google.maps.LatLngBounds();
+      const bounds = new window.google.maps.LatLngBounds();
       newMarkers.forEach(marker => {
         const position = marker.getPosition();
         if (position) bounds.extend(position);
@@ -303,10 +317,16 @@ const GoogleMapsHospitalFinder: React.FC = () => {
       return;
     }
 
+    if (!window.google) {
+      // If Google Maps isn't loaded yet, fallback to name search
+      searchHospitalsByName(searchQuery);
+      return;
+    }
+
     // Try geocoding first
-    const geocoder = new google.maps.Geocoder();
-    geocoder.geocode({ address: searchQuery }, (results, status) => {
-      if (status === 'OK' && results && results[0] && results[0].geometry) {
+    const geocoder = new window.google.maps.Geocoder();
+    geocoder.geocode({ address: searchQuery }, (results: any, status: string) => {
+      if (status === 'OK' && results && results[0] && results[0].geometry && results[0].geometry.location) {
         const location = results[0].geometry.location;
         const coords = { lat: location.lat(), lng: location.lng() };
         if (map) {
@@ -341,12 +361,11 @@ const GoogleMapsHospitalFinder: React.FC = () => {
           map.setZoom(14);
 
           // Add user marker
-          new google.maps.Marker({
+          new window.google.maps.Marker({
             position: coords,
             map,
             title: 'You are here',
             icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
-            zIndex: 9999,
           });
         }
 
@@ -361,7 +380,7 @@ const GoogleMapsHospitalFinder: React.FC = () => {
   };
 
   // Global functions for info window buttons
-  React.useEffect(() => {
+  useEffect(() => {
     (window as any).openDirections = (lat: number, lng: number) => {
       const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
       window.open(url, '_blank');
@@ -373,7 +392,7 @@ const GoogleMapsHospitalFinder: React.FC = () => {
         if (position) {
           map.panTo(position);
           map.setZoom(15);
-          infoWindows.forEach(iw => iw.close());
+          infoWindows.forEach((iw: any) => iw.close());
           infoWindows[index].open(map, markers[index]);
           highlightListItem(index);
         }
@@ -475,7 +494,7 @@ const GoogleMapsHospitalFinder: React.FC = () => {
                         if (position) {
                           map.panTo(position);
                           map.setZoom(15);
-                          infoWindows.forEach(iw => iw.close());
+                          infoWindows.forEach((iw: any) => iw.close());
                           infoWindows[index].open(map, markers[index]);
                           highlightListItem(index);
                         }

@@ -12,16 +12,48 @@ declare namespace google {
       setCenter(latlng: LatLng | LatLngLiteral): void;
       getCenter(): LatLng;
       getZoom(): number;
+      setZoom(zoom: number): void;
+      panTo(latlng: LatLng | LatLngLiteral): void;
+      fitBounds(bounds: LatLngBounds, padding?: number): void;
+      setMapTypeId(mapTypeId: string): void;
+    }
+
+    class LatLngBounds {
+      constructor();
+      extend(point: LatLng | LatLngLiteral): void;
     }
 
     class Marker {
       constructor(opts?: MarkerOptions);
       addListener(eventName: string, handler: Function): void;
+      setMap(map: Map | null): void;
+      getPosition(): LatLng | undefined;
+      setPosition(position: LatLng | LatLngLiteral): void;
     }
 
     class InfoWindow {
       constructor(opts?: InfoWindowOptions);
       open(map?: Map, anchor?: Marker): void;
+      close(): void;
+    }
+
+    class Geocoder {
+      constructor();
+      geocode(request: GeocoderRequest, callback: (results: GeocoderResult[] | null, status: GeocoderStatus) => void): void;
+    }
+
+    interface GeocoderRequest {
+      address?: string;
+    }
+
+    interface GeocoderResult {
+      geometry: {
+        location: LatLng;
+      };
+    }
+
+    enum GeocoderStatus {
+      OK = 'OK'
     }
 
     class LatLng {
@@ -38,6 +70,10 @@ declare namespace google {
       zoom?: number;
       center?: LatLng | LatLngLiteral;
       styles?: MapTypeStyle[];
+      mapTypeId?: string;
+      mapTypeControl?: boolean;
+      streetViewControl?: boolean;
+      gestureHandling?: string;
     }
 
     interface MarkerOptions {
@@ -65,6 +101,25 @@ declare namespace google {
       featureType?: string;
       elementType?: string;
       stylers?: any[];
+    }
+
+    namespace places {
+      class Autocomplete {
+        constructor(inputField: HTMLInputElement, opts?: AutocompleteOptions);
+        addListener(eventName: string, handler: Function): void;
+        getPlace(): PlaceResult;
+      }
+
+      interface AutocompleteOptions {
+        types?: string[];
+        componentRestrictions?: any;
+      }
+
+      interface PlaceResult {
+        geometry?: {
+          location?: LatLng;
+        };
+      }
     }
   }
 }

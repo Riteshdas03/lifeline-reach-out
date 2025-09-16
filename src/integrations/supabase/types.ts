@@ -952,6 +952,26 @@ export type Database = {
           type: Database["public"]["Enums"]["hospital_type"]
         }[]
       }
+      get_nearby_hospitals_with_search: {
+        Args: {
+          lat: number
+          lng: number
+          radius_m?: number
+          search_term?: string
+        }
+        Returns: {
+          address: string
+          contact: string
+          distance_m: number
+          id: string
+          latitude: number
+          longitude: number
+          name: string
+          services: string[]
+          status: Database["public"]["Enums"]["hospital_status"]
+          type: Database["public"]["Enums"]["hospital_type"]
+        }[]
+      }
       get_proj4_from_srid: {
         Args: { "": number }
         Returns: string
