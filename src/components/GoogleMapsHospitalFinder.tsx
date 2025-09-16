@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { Loader2, MapPin, Phone, Navigation, Map as MapIcon, List, Car, Clock, Route, X, Copy, Satellite } from 'lucide-react';
+import { Loader2, MapPin, Phone, Navigation, Map as MapIcon, List, Car, Clock, Route, X, Copy, Layers } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -652,7 +652,7 @@ const GoogleMapsHospitalFinder: React.FC = () => {
               size="sm"
               onClick={() => setMapType('satellite')}
             >
-              <Satellite className="w-4 h-4" />
+              <Layers className="w-4 h-4" />
             </Button>
           </div>
         </div>
