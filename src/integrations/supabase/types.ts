@@ -394,6 +394,60 @@ export type Database = {
         }
         Relationships: []
       }
+      routes: {
+        Row: {
+          created_at: string
+          destination_address: string | null
+          destination_name: string | null
+          distance_km: number | null
+          end_lat: number
+          end_lng: number
+          eta_minutes: number | null
+          id: string
+          polyline: string | null
+          start_lat: number
+          start_lng: number
+          status: string
+          updated_at: string
+          user_id: string
+          vehicle_type: string
+        }
+        Insert: {
+          created_at?: string
+          destination_address?: string | null
+          destination_name?: string | null
+          distance_km?: number | null
+          end_lat: number
+          end_lng: number
+          eta_minutes?: number | null
+          id?: string
+          polyline?: string | null
+          start_lat: number
+          start_lng: number
+          status?: string
+          updated_at?: string
+          user_id: string
+          vehicle_type?: string
+        }
+        Update: {
+          created_at?: string
+          destination_address?: string | null
+          destination_name?: string | null
+          distance_km?: number | null
+          end_lat?: number
+          end_lng?: number
+          eta_minutes?: number | null
+          id?: string
+          polyline?: string | null
+          start_lat?: number
+          start_lng?: number
+          status?: string
+          updated_at?: string
+          user_id?: string
+          vehicle_type?: string
+        }
+        Relationships: []
+      }
       spatial_ref_sys: {
         Row: {
           auth_name: string | null
@@ -417,6 +471,62 @@ export type Database = {
           srtext?: string | null
         }
         Relationships: []
+      }
+      tracking: {
+        Row: {
+          created_at: string
+          current_step_index: number | null
+          heading: number | null
+          id: string
+          lat: number
+          lng: number
+          remaining_distance_km: number | null
+          remaining_eta_minutes: number | null
+          route_id: string
+          speed: number | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_step_index?: number | null
+          heading?: number | null
+          id?: string
+          lat: number
+          lng: number
+          remaining_distance_km?: number | null
+          remaining_eta_minutes?: number | null
+          route_id: string
+          speed?: number | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_step_index?: number | null
+          heading?: number | null
+          id?: string
+          lat?: number
+          lng?: number
+          remaining_distance_km?: number | null
+          remaining_eta_minutes?: number | null
+          route_id?: string
+          speed?: number | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tracking_route_id_fkey"
+            columns: ["route_id"]
+            isOneToOne: false
+            referencedRelation: "routes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
@@ -975,6 +1085,10 @@ export type Database = {
       get_proj4_from_srid: {
         Args: { "": number }
         Returns: string
+      }
+      get_route_with_tracking: {
+        Args: { route_uuid: string }
+        Returns: Json
       }
       gettransactionid: {
         Args: Record<PropertyKey, never>
@@ -2270,6 +2384,16 @@ export type Database = {
       unlockrows: {
         Args: { "": string }
         Returns: number
+      }
+      update_tracking_location: {
+        Args: {
+          new_heading?: number
+          new_lat: number
+          new_lng: number
+          new_speed?: number
+          route_uuid: string
+        }
+        Returns: Json
       }
       updategeometrysrid: {
         Args: {
