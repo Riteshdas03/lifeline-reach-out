@@ -73,6 +73,8 @@ declare namespace google {
       mapTypeId?: string;
       mapTypeControl?: boolean;
       streetViewControl?: boolean;
+      fullscreenControl?: boolean;
+      zoomControl?: boolean;
       gestureHandling?: string;
     }
 
@@ -103,6 +105,90 @@ declare namespace google {
       stylers?: any[];
     }
 
+    enum MapTypeId {
+      ROADMAP = 'roadmap',
+      SATELLITE = 'satellite',
+      HYBRID = 'hybrid',
+      TERRAIN = 'terrain',
+    }
+
+    class DirectionsService {
+      route(request: DirectionsRequest, callback: (result: DirectionsResult | null, status: DirectionsStatus) => void): void;
+    }
+
+    class DirectionsRenderer {
+      constructor(opts?: DirectionsRendererOptions);
+      setMap(map: Map | null): void;
+      setDirections(directions: DirectionsResult): void;
+      setRouteIndex(index: number): void;
+    }
+
+    interface DirectionsRequest {
+      origin: LatLng | LatLngLiteral | string;
+      destination: LatLng | LatLngLiteral | string;
+      travelMode: TravelMode;
+      provideRouteAlternatives?: boolean;
+    }
+
+    interface DirectionsResult {
+      routes: DirectionsRoute[];
+    }
+
+    interface DirectionsRoute {
+      legs: DirectionsLeg[];
+      overview_polyline: { points: string };
+    }
+
+    interface DirectionsLeg {
+      distance: { text: string; value: number };
+      duration: { text: string; value: number };
+      steps: DirectionsStep[];
+    }
+
+    interface DirectionsStep {
+      html_instructions: string;
+      distance: { text: string; value: number };
+      duration: { text: string; value: number };
+      end_location: LatLng;
+    }
+
+    enum DirectionsStatus {
+      OK = 'OK',
+      ERROR = 'ERROR',
+    }
+
+    enum TravelMode {
+      DRIVING = 'DRIVING',
+      BICYCLING = 'BICYCLING',
+      WALKING = 'WALKING',
+    }
+
+    interface DirectionsRendererOptions {
+      map?: Map;
+      suppressMarkers?: boolean;
+      polylineOptions?: PolylineOptions;
+    }
+
+    class Polyline {
+      constructor(opts?: PolylineOptions);
+      setMap(map: Map | null): void;
+      addListener(eventName: string, handler: Function): void;
+    }
+
+    interface PolylineOptions {
+      path?: LatLng[] | LatLngLiteral[];
+      strokeColor?: string;
+      strokeOpacity?: number;
+      strokeWeight?: number;
+      map?: Map;
+    }
+
+    namespace geometry {
+      namespace encoding {
+        function decodePath(encodedPath: string): LatLng[];
+      }
+    }
+
     namespace places {
       class Autocomplete {
         constructor(inputField: HTMLInputElement, opts?: AutocompleteOptions);
@@ -116,6 +202,9 @@ declare namespace google {
       }
 
       interface PlaceResult {
+        place_id?: string;
+        name?: string;
+        formatted_address?: string;
         geometry?: {
           location?: LatLng;
         };

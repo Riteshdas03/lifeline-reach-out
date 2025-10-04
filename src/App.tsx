@@ -16,6 +16,7 @@ import FindHospitals from "./pages/FindHospitals";
 import EmergencyServicesPage from "./pages/EmergencyServices";
 import HealthCampsPage from "./pages/HealthCamps";
 import BloodBanks from "./pages/BloodBanks";
+import Navigation from "./pages/Navigation";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
@@ -46,6 +47,7 @@ const App = () => (
             <Route path="/contact" element={<Contact />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />
+            <Route path="/navigate" element={<Navigation />} />
             <Route path="/api-test" element={<ApiTestPanel />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

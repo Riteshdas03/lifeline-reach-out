@@ -1,1 +1,13 @@
 project_id = "hlvkisfjusxposvmybag"
+
+[functions.create-route]
+verify_jwt = true
+
+[functions.start-tracking]
+verify_jwt = true
+
+[functions.update-tracking]
+verify_jwt = true
+
+[functions.get-tracking]
+verify_jwt = true
