@@ -1,5 +1,3 @@
-/// <reference path="../types/google-maps.d.ts" />
-
 import { useEffect, useRef, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
