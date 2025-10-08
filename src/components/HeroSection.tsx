@@ -89,7 +89,7 @@ const HeroSection = () => {
     <section className="relative overflow-hidden bg-gradient-to-br from-[#A3E4D7] via-white to-[#E8F8F5]">
       {/* Animated Background Elements */}
       <motion.div 
-        className="absolute top-20 left-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl"
+        className="absolute top-10 sm:top-20 left-5 sm:left-10 w-24 h-24 sm:w-32 sm:h-32 bg-primary/10 rounded-full blur-3xl"
         animate={{
           scale: [1, 1.2, 1],
           opacity: [0.3, 0.5, 0.3]
@@ -101,7 +101,7 @@ const HeroSection = () => {
         }}
       />
       <motion.div 
-        className="absolute bottom-20 right-10 w-40 h-40 bg-secondary/20 rounded-full blur-3xl"
+        className="absolute bottom-10 sm:bottom-20 right-5 sm:right-10 w-32 h-32 sm:w-40 sm:h-40 bg-secondary/20 rounded-full blur-3xl"
         animate={{
           scale: [1, 1.3, 1],
           opacity: [0.2, 0.4, 0.2]
@@ -147,32 +147,40 @@ const HeroSection = () => {
 
             {/* Quick Actions - Animated */}
             <motion.div 
-              className="flex flex-col sm:flex-row gap-3 sm:gap-4"
+              className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full"
               variants={fadeInUp}
             >
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <motion.div 
+                whileHover={{ scale: 1.05 }} 
+                whileTap={{ scale: 0.95 }}
+                className="w-full sm:w-auto"
+              >
                 <Button 
                   size="lg" 
-                  className="bg-destructive hover:bg-destructive/90 text-white shadow-xl group text-sm sm:text-base px-6 sm:px-8 py-3 sm:py-6 rounded-2xl"
+                  className="w-full sm:w-auto bg-destructive hover:bg-destructive/90 text-white shadow-xl group text-sm sm:text-base md:text-lg px-4 sm:px-6 md:px-8 py-4 sm:py-5 md:py-6 rounded-xl sm:rounded-2xl h-auto min-h-[48px] sm:min-h-[56px]"
                   onClick={handleEmergencyClick}
                   disabled={emergencyLoading}
                 >
-                  <Phone className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 group-hover:animate-pulse" />
-                  {emergencyLoading ? 'Finding Hospital...' : '🚨 Emergency Help'}
-                  <Zap className="w-3 h-3 sm:w-4 sm:h-4 ml-2" />
+                  <Phone className="w-4 h-4 sm:w-5 sm:h-5 mr-2 group-hover:animate-pulse flex-shrink-0" />
+                  <span className="flex-1">{emergencyLoading ? 'Finding Hospital...' : '🚨 Emergency Help'}</span>
+                  <Zap className="w-3 h-3 sm:w-4 sm:h-4 ml-2 flex-shrink-0" />
                 </Button>
               </motion.div>
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <motion.div 
+                whileHover={{ scale: 1.05 }} 
+                whileTap={{ scale: 0.95 }}
+                className="w-full sm:w-auto"
+              >
                 <Button 
                   size="lg" 
                   variant="outline" 
-                  className="border-2 border-primary/30 bg-white/50 backdrop-blur-sm text-foreground hover:bg-primary hover:text-white shadow-xl text-sm sm:text-base px-6 sm:px-8 py-3 sm:py-6 rounded-2xl"
+                  className="w-full sm:w-auto border-2 border-primary/30 bg-white/50 backdrop-blur-sm text-foreground hover:bg-primary hover:text-white shadow-xl text-sm sm:text-base md:text-lg px-4 sm:px-6 md:px-8 py-4 sm:py-5 md:py-6 rounded-xl sm:rounded-2xl h-auto min-h-[48px] sm:min-h-[56px]"
                   onClick={() => {
                     document.getElementById('services-section')?.scrollIntoView({ behavior: 'smooth' });
                   }}
                 >
-                  <MapPin className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3" />
-                  🏥 Find Hospitals
+                  <MapPin className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
+                  <span className="flex-1">🏥 Find Hospitals</span>
                 </Button>
               </motion.div>
             </motion.div>
@@ -266,10 +274,11 @@ const HeroSection = () => {
 
           {/* Right Content - Hero Illustration with Animation */}
           <motion.div
-            className="relative hidden lg:block"
+            className="relative w-full max-w-md mx-auto lg:max-w-none"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, delay: 0.3 }}
+            viewport={{ once: true, amount: 0.3 }}
           >
             <motion.div
               animate={{
@@ -284,13 +293,13 @@ const HeroSection = () => {
               <img 
                 src={heroIllustration} 
                 alt="Healthcare Professional" 
-                className="w-full h-auto rounded-3xl shadow-2xl"
+                className="w-full h-auto rounded-2xl sm:rounded-3xl shadow-2xl"
               />
             </motion.div>
             
             {/* Floating decorative elements */}
             <motion.div
-              className="absolute -top-4 -right-4 w-20 h-20 bg-primary/20 rounded-full blur-2xl"
+              className="absolute -top-2 sm:-top-4 -right-2 sm:-right-4 w-16 h-16 sm:w-20 sm:h-20 bg-primary/20 rounded-full blur-2xl"
               animate={{
                 scale: [1, 1.3, 1],
                 opacity: [0.3, 0.6, 0.3]

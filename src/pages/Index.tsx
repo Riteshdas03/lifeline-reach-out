@@ -21,13 +21,24 @@ import iconAmbulance from '@/assets/icon-ambulance.png';
 const Index = () => {
   const [activeTab, setActiveTab] = useState('hospitals');
 
-  // Initialize AOS
+  // Initialize AOS for all devices
   useEffect(() => {
     AOS.init({
       duration: 800,
       once: true,
-      easing: 'ease-out'
+      offset: 50,
+      disable: false, // Enable on all devices including mobile
+      easing: 'ease-in-out',
+      anchorPlacement: 'top-bottom',
     });
+    
+    // Refresh AOS on window resize for responsive behavior
+    const handleResize = () => {
+      AOS.refresh();
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const stats = [
@@ -262,19 +273,19 @@ const Index = () => {
             data-aos="fade-up"
             data-aos-delay="300"
           >
-            <Link to="/register-hospital">
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button size="lg" className="w-full sm:w-auto bg-white text-primary hover:bg-gray-100 text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-6 rounded-2xl shadow-xl font-semibold">
-                  <MapPin className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" />
-                  Register Your Hospital
+            <Link to="/register-hospital" className="w-full sm:w-auto">
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="w-full sm:w-auto">
+                <Button size="lg" className="w-full sm:w-auto bg-white text-primary hover:bg-gray-100 text-sm sm:text-base md:text-lg px-4 sm:px-6 md:px-8 py-4 sm:py-5 md:py-6 rounded-xl sm:rounded-2xl shadow-xl font-semibold h-auto min-h-[48px] sm:min-h-[56px]">
+                  <MapPin className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 mr-2 flex-shrink-0" />
+                  <span className="flex-1">Register Your Hospital</span>
                 </Button>
               </motion.div>
             </Link>
-            <Link to="/become-donor">
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button size="lg" variant="outline" className="w-full sm:w-auto border-2 border-white/30 bg-white/10 backdrop-blur-sm text-white hover:bg-white hover:text-primary text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-6 rounded-2xl shadow-xl font-semibold">
-                  <Heart className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" />
-                  Become a Blood Donor
+            <Link to="/become-donor" className="w-full sm:w-auto">
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="w-full sm:w-auto">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto border-2 border-white/30 bg-white/10 backdrop-blur-sm text-white hover:bg-white hover:text-primary text-sm sm:text-base md:text-lg px-4 sm:px-6 md:px-8 py-4 sm:py-5 md:py-6 rounded-xl sm:rounded-2xl shadow-xl font-semibold h-auto min-h-[48px] sm:min-h-[56px]">
+                  <Heart className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 mr-2 flex-shrink-0" />
+                  <span className="flex-1">Become a Blood Donor</span>
                 </Button>
               </motion.div>
             </Link>
