@@ -1,4 +1,3 @@
-
 import { MapPin, Phone, Heart, Search, Navigation, Sparkles, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,12 +6,35 @@ import { Badge } from '@/components/ui/badge';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import heroIllustration from '@/assets/hero-medical-illustration.png';
 
 const HeroSection = () => {
   const [emergencyLoading, setEmergencyLoading] = useState(false);
   const { latitude, longitude, getCurrentLocation } = useGeolocation();
   const { toast } = useToast();
+
+  // Animation variants
+  const fadeInUp = {
+    initial: { opacity: 0, y: 30 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.8 }
+  };
+
+  const fadeInRight = {
+    initial: { opacity: 0, x: -30 },
+    animate: { opacity: 1, x: 0 },
+    transition: { duration: 0.8, delay: 0.2 }
+  };
+
+  const staggerContainer = {
+    animate: {
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
 
   const handleEmergencyClick = async () => {
     if (!latitude || !longitude) {
@@ -43,7 +65,6 @@ const HeroSection = () => {
           description: `📞 ${nearest.contact} | ${nearest.distance_km?.toFixed(1)} km away`,
         });
         
-        // Show alert with hospital info
         const confirmed = confirm(
           `🚨 EMERGENCY ALERT\n\nNearest Hospital: ${nearest.name}\nDistance: ${nearest.distance_km?.toFixed(1)} km\nContact: ${nearest.contact}\n\nPress OK to call hospital or Cancel to call 108`
         );
@@ -65,85 +86,113 @@ const HeroSection = () => {
   };
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-30">
-        <div className="w-full h-full bg-repeat" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
-        }}></div>
-      </div>
-      
-      {/* Floating Elements */}
-      <div className="absolute top-20 left-10 animate-bounce">
-        <div className="w-8 h-8 bg-blue-400/20 rounded-full blur-sm"></div>
-      </div>
-      <div className="absolute top-40 right-20 animate-pulse">
-        <div className="w-6 h-6 bg-white/10 rounded-full"></div>
-      </div>
+    <section className="relative overflow-hidden bg-gradient-to-br from-[#A3E4D7] via-white to-[#E8F8F5]">
+      {/* Animated Background Elements */}
+      <motion.div 
+        className="absolute top-20 left-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl"
+        animate={{
+          scale: [1, 1.2, 1],
+          opacity: [0.3, 0.5, 0.3]
+        }}
+        transition={{
+          duration: 4,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+      />
+      <motion.div 
+        className="absolute bottom-20 right-10 w-40 h-40 bg-secondary/20 rounded-full blur-3xl"
+        animate={{
+          scale: [1, 1.3, 1],
+          opacity: [0.2, 0.4, 0.2]
+        }}
+        transition={{
+          duration: 5,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: 1
+        }}
+      />
       
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
-          {/* Left Content */}
-          <div className="text-center lg:text-left space-y-6 lg:space-y-8">
-            <div className="inline-flex items-center bg-blue-500/20 backdrop-blur-md border border-blue-400/30 rounded-full px-4 sm:px-6 py-2 sm:py-3 shadow-lg">
-              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-blue-200 mr-2 sm:mr-3" />
-              <span className="text-blue-100 font-medium text-sm sm:text-base">Trusted by 25,000+ patients nationwide</span>
-            </div>
+          {/* Left Content - Animated */}
+          <motion.div 
+            className="text-center lg:text-left space-y-6 lg:space-y-8"
+            initial="initial"
+            animate="animate"
+            variants={staggerContainer}
+          >
+            <motion.div 
+              className="inline-flex items-center bg-white/80 backdrop-blur-md border border-primary/20 rounded-full px-4 sm:px-6 py-2 sm:py-3 shadow-lg"
+              variants={fadeInUp}
+            >
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-primary mr-2 sm:mr-3" />
+              <span className="text-foreground font-medium text-sm sm:text-base">Trusted by 25,000+ patients nationwide</span>
+            </motion.div>
             
-            <div className="space-y-4 sm:space-y-6">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-tight">
-                Find Nearby 
-                <span className="block bg-gradient-to-r from-blue-200 to-cyan-200 bg-clip-text text-transparent">
-                  Healthcare Access
+            <motion.div className="space-y-4 sm:space-y-6" variants={fadeInUp}>
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
+                Your Health Is Our 
+                <span className="block bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                  First Priority
                 </span>
               </h1>
               
-              <p className="text-lg sm:text-xl lg:text-2xl text-blue-100 max-w-2xl leading-relaxed">
+              <p className="text-lg sm:text-xl lg:text-2xl text-muted-foreground max-w-2xl leading-relaxed">
                 Discover hospitals, blood banks, and emergency medical aid in real-time. 
                 Because every second counts when lives are at stake.
               </p>
-            </div>
+            </motion.div>
 
-            {/* Quick Actions */}
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-              <Button 
-                size="lg" 
-                className="bg-red-600 hover:bg-red-700 text-white shadow-xl transform hover:scale-105 transition-all duration-300 group text-sm sm:text-base px-6 sm:px-8 py-3 sm:py-4"
-                onClick={handleEmergencyClick}
-                disabled={emergencyLoading}
-              >
-                <Phone className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 group-hover:animate-pulse" />
-                {emergencyLoading ? 'Finding Hospital...' : '🚨 Emergency Help'}
-                <Zap className="w-3 h-3 sm:w-4 sm:h-4 ml-2" />
-              </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
-                className="border-2 border-white/30 text-white hover:bg-white hover:text-blue-600 shadow-xl backdrop-blur-sm text-sm sm:text-base px-6 sm:px-8 py-3 sm:py-4"
-                onClick={() => {
-                  document.getElementById('services-section')?.scrollIntoView({ behavior: 'smooth' });
-                }}
-              >
-                <MapPin className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3" />
-                🏥 Find Hospitals
-              </Button>
-            </div>
+            {/* Quick Actions - Animated */}
+            <motion.div 
+              className="flex flex-col sm:flex-row gap-3 sm:gap-4"
+              variants={fadeInUp}
+            >
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Button 
+                  size="lg" 
+                  className="bg-destructive hover:bg-destructive/90 text-white shadow-xl group text-sm sm:text-base px-6 sm:px-8 py-3 sm:py-6 rounded-2xl"
+                  onClick={handleEmergencyClick}
+                  disabled={emergencyLoading}
+                >
+                  <Phone className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 group-hover:animate-pulse" />
+                  {emergencyLoading ? 'Finding Hospital...' : '🚨 Emergency Help'}
+                  <Zap className="w-3 h-3 sm:w-4 sm:h-4 ml-2" />
+                </Button>
+              </motion.div>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  className="border-2 border-primary/30 bg-white/50 backdrop-blur-sm text-foreground hover:bg-primary hover:text-white shadow-xl text-sm sm:text-base px-6 sm:px-8 py-3 sm:py-6 rounded-2xl"
+                  onClick={() => {
+                    document.getElementById('services-section')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                >
+                  <MapPin className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3" />
+                  🏥 Find Hospitals
+                </Button>
+              </motion.div>
+            </motion.div>
 
-            {/* Enhanced Search Bar */}
-            <div className="relative max-w-lg mx-auto lg:mx-0">
+            {/* Enhanced Search Bar - Animated */}
+            <motion.div 
+              className="relative max-w-lg mx-auto lg:mx-0"
+              variants={fadeInUp}
+            >
               <div className="relative">
-                <Search className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
+                <Search className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4 sm:w-5 sm:h-5" />
                 <Input 
                   placeholder="Search by location or hospital name..."
-                  className="hero-search-input pl-10 sm:pl-12 pr-12 sm:pr-16 py-3 sm:py-4 bg-white/95 backdrop-blur-sm border-0 rounded-xl sm:rounded-2xl shadow-2xl text-gray-800 placeholder:text-gray-500 focus:ring-4 focus:ring-blue-300/50 text-sm sm:text-base"
+                  className="hero-search-input pl-10 sm:pl-12 pr-12 sm:pr-16 py-3 sm:py-4 bg-white/95 backdrop-blur-sm border-2 border-primary/20 rounded-2xl shadow-lg text-foreground placeholder:text-muted-foreground focus:ring-4 focus:ring-primary/20 text-sm sm:text-base"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       const input = e.target as HTMLInputElement;
                       const searchValue = input.value;
                       if (searchValue.trim()) {
-                        // Scroll to services section and set search query
                         document.getElementById('services-section')?.scrollIntoView({ behavior: 'smooth' });
-                        // Trigger search in HospitalFinder component
                         setTimeout(() => {
                           const hospitalTab = document.querySelector('[data-tab="hospitals"]') as HTMLButtonElement;
                           if (hospitalTab) hospitalTab.click();
@@ -159,7 +208,7 @@ const HeroSection = () => {
                   }}
                 />
                 <Button 
-                  className="absolute right-1 sm:right-2 top-1/2 transform -translate-y-1/2 bg-blue-600 hover:bg-blue-700 rounded-lg sm:rounded-xl p-2 sm:p-3"
+                  className="absolute right-1 sm:right-2 top-1/2 transform -translate-y-1/2 bg-primary hover:bg-primary/90 rounded-xl p-2 sm:p-3"
                   onClick={() => {
                     const input = document.querySelector('.hero-search-input') as HTMLInputElement;
                     const searchValue = input?.value;
@@ -178,82 +227,81 @@ const HeroSection = () => {
                     }
                   }}
                 >
-                  <Navigation className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <Navigation className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                 </Button>
               </div>
-            </div>
+            </motion.div>
 
-            {/* Trust Indicators */}
-            <div className="flex flex-wrap justify-center lg:justify-start gap-4 sm:gap-6 text-blue-200">
+            {/* Trust Indicators - Animated */}
+            <motion.div 
+              className="flex flex-wrap justify-center lg:justify-start gap-4 sm:gap-6 text-muted-foreground"
+              variants={fadeInUp}
+            >
               <div className="flex items-center">
-                <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
+                <motion.div 
+                  className="w-2 h-2 bg-primary rounded-full mr-2"
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                />
                 <span className="text-xs sm:text-sm">Real-time updates</span>
               </div>
               <div className="flex items-center">
-                <div className="w-2 h-2 bg-blue-400 rounded-full mr-2 animate-pulse"></div>
+                <motion.div 
+                  className="w-2 h-2 bg-secondary rounded-full mr-2"
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 2, repeat: Infinity, delay: 0.3 }}
+                />
                 <span className="text-xs sm:text-sm">1,200+ verified hospitals</span>
               </div>
               <div className="flex items-center">
-                <div className="w-2 h-2 bg-red-400 rounded-full mr-2 animate-pulse"></div>
+                <motion.div 
+                  className="w-2 h-2 bg-destructive rounded-full mr-2"
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 2, repeat: Infinity, delay: 0.6 }}
+                />
                 <span className="text-xs sm:text-sm">24/7 emergency support</span>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
-          {/* Right Content - Enhanced Feature Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mt-8 lg:mt-0">
-            <Card className="bg-white/95 backdrop-blur-md border-0 shadow-2xl hover:shadow-3xl transition-all duration-500 transform hover:-translate-y-3 group">
-              <CardContent className="p-6 sm:p-8 text-center">
-                <div className="bg-gradient-to-br from-green-400 to-green-600 w-16 h-16 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <MapPin className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
-                </div>
-                <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3">Real-time Status</h3>
-                <p className="text-gray-600 leading-relaxed text-sm sm:text-base">Live availability updates from 1,200+ healthcare facilities across the country</p>
-                <Badge className="mt-3 sm:mt-4 bg-green-100 text-green-800 border-green-200 text-xs sm:text-sm">
-                  99.9% Uptime
-                </Badge>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white/95 backdrop-blur-md border-0 shadow-2xl hover:shadow-3xl transition-all duration-500 transform hover:-translate-y-3 group">
-              <CardContent className="p-6 sm:p-8 text-center">
-                <div className="bg-gradient-to-br from-red-400 to-red-600 w-16 h-16 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <Heart className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
-                </div>
-                <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3">Blood Bank Network</h3>
-                <p className="text-gray-600 leading-relaxed text-sm sm:text-base">50,000+ verified donors across all blood groups nationwide</p>
-                <Badge className="mt-3 sm:mt-4 bg-red-100 text-red-800 border-red-200 text-xs sm:text-sm">
-                  Active Network
-                </Badge>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white/95 backdrop-blur-md border-0 shadow-2xl hover:shadow-3xl transition-all duration-500 transform hover:-translate-y-3 group">
-              <CardContent className="p-6 sm:p-8 text-center">
-                <div className="bg-gradient-to-br from-blue-400 to-blue-600 w-16 h-16 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <Phone className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
-                </div>
-                <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3">Emergency Response</h3>
-                <p className="text-gray-600 leading-relaxed text-sm sm:text-base">Average 3-minute response time for critical medical emergencies</p>
-                <Badge className="mt-3 sm:mt-4 bg-blue-100 text-blue-800 border-blue-200 text-xs sm:text-sm">
-                  24/7 Support
-                </Badge>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white/95 backdrop-blur-md border-0 shadow-2xl hover:shadow-3xl transition-all duration-500 transform hover:-translate-y-3 group">
-              <CardContent className="p-6 sm:p-8 text-center">
-                <div className="bg-gradient-to-br from-purple-400 to-purple-600 w-16 h-16 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <Navigation className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
-                </div>
-                <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3">Smart Directions</h3>
-                <p className="text-gray-600 leading-relaxed text-sm sm:text-base">GPS-powered routing to the nearest available healthcare facility</p>
-                <Badge className="mt-3 sm:mt-4 bg-purple-100 text-purple-800 border-purple-200 text-xs sm:text-sm">
-                  AI Powered
-                </Badge>
-              </CardContent>
-            </Card>
-          </div>
+          {/* Right Content - Hero Illustration with Animation */}
+          <motion.div
+            className="relative hidden lg:block"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, delay: 0.3 }}
+          >
+            <motion.div
+              animate={{
+                y: [0, -20, 0],
+              }}
+              transition={{
+                duration: 4,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            >
+              <img 
+                src={heroIllustration} 
+                alt="Healthcare Professional" 
+                className="w-full h-auto rounded-3xl shadow-2xl"
+              />
+            </motion.div>
+            
+            {/* Floating decorative elements */}
+            <motion.div
+              className="absolute -top-4 -right-4 w-20 h-20 bg-primary/20 rounded-full blur-2xl"
+              animate={{
+                scale: [1, 1.3, 1],
+                opacity: [0.3, 0.6, 0.3]
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            />
+          </motion.div>
         </div>
       </div>
     </section>
